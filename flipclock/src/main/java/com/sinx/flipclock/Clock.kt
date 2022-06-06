@@ -10,7 +10,7 @@ import android.util.Log
 import android.view.View
 import kotlin.math.min
 
-class FlipClock @JvmOverloads constructor(
+class Clock @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
@@ -28,7 +28,7 @@ class FlipClock @JvmOverloads constructor(
         setMeasuredDimension(
             measureWidth,
             measureHeight
-        );
+        )
     }
     private fun measureDimension(desiredSize: Int, measureSpec: Int): Int {
         val specMode = MeasureSpec.getMode(measureSpec)
@@ -52,10 +52,12 @@ class FlipClock @JvmOverloads constructor(
     private val bounds = Rect()
     override fun onDraw(canvas: Canvas?) {
         canvas?.let {
-            val xPos = 0
             textPaint.getTextBounds(text, 0, text.length, bounds)
-            val yPos = height / 2 + bounds.height() / 2
-            it.drawText(text, xPos.toFloat(), yPos.toFloat(), textPaint)
+            val yPos = height.half + bounds.height().half
+            it.drawText(text, 0f, yPos.toFloat(), textPaint)
         }
     }
+
+    private val Int.half
+        get() = this / 2
 }
