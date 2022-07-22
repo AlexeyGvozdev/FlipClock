@@ -18,18 +18,24 @@ class Clock @JvmOverloads constructor(
         color = Color.BLACK
     }
 
+    private val text = "88"
+    private val bounds = Rect()
+    private val dividerHeight = 5
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val desiredWidth = suggestedMinimumWidth + paddingLeft + paddingRight
         val desiredHeight = suggestedMinimumHeight + paddingTop + paddingBottom
 
         val measureWidth = measureDimension(desiredWidth, widthMeasureSpec)
         val measureHeight = measureDimension(desiredHeight, heightMeasureSpec)
-        textPaint.textSize = minOf(measureHeight, measureWidth) / textPaint.measureText(text) * textPaint.textSize
+        textPaint.textSize =
+            minOf(measureHeight, measureWidth) / textPaint.measureText(text) * textPaint.textSize
         setMeasuredDimension(
             measureWidth,
             measureHeight
         )
     }
+
     private fun measureDimension(desiredSize: Int, measureSpec: Int): Int {
         val specMode = MeasureSpec.getMode(measureSpec)
         val specSize = MeasureSpec.getSize(measureSpec)
@@ -48,12 +54,26 @@ class Clock @JvmOverloads constructor(
         return result
     }
 
-    private val text = "88"
-    private val bounds = Rect()
     override fun onDraw(canvas: Canvas?) {
         canvas?.let {
             textPaint.getTextBounds(text, 0, text.length, bounds)
             val yPos = height.half + bounds.height().half
+            it.save()
+            it.clipRect(
+                0,
+                0,
+                width,
+                height.half - dividerHeight
+            )
+            it.drawText(text, 0f, yPos.toFloat(), textPaint)
+            it.restore()
+            it.clipRect(
+                0,
+                height.half + dividerHeight,
+                width,
+                height
+            )
+            textPaint.color = Color.BLUE
             it.drawText(text, 0f, yPos.toFloat(), textPaint)
         }
     }
