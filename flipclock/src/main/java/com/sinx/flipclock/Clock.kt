@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.view.ViewGroup
+import kotlin.math.max
 import kotlin.math.min
 
 class Clock @JvmOverloads constructor(
@@ -11,7 +12,6 @@ class Clock @JvmOverloads constructor(
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
     private val numberHourView = Number(context, attrs, defStyleAttr)
-    private val dividerTextView = Divider(context, attrs, defStyleAttr)
     private val numberMinuteView = Number(context, attrs, defStyleAttr)
 
     private val hour = "10"
@@ -21,7 +21,6 @@ class Clock @JvmOverloads constructor(
         numberHourView.text = hour
         numberMinuteView.text = min
         addView(numberHourView)
-        addView(dividerTextView)
         addView(numberMinuteView)
     }
 
@@ -32,19 +31,14 @@ class Clock @JvmOverloads constructor(
 
         val measureWidth = measureDimension(desiredWidth, widthMeasureSpec)
         val measureHeight = measureDimension(desiredHeight, heightMeasureSpec)
-        val numberWidth = measureWidth / 2 * 9 / 10
-        val dividerWidth = measureWidth / 2 * 1 / 10
+        val numberWidth = min(measureWidth / 2, measureHeight)
         numberHourView.measure(
             MeasureSpec.makeMeasureSpec(numberWidth, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(measureHeight, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(numberWidth, MeasureSpec.EXACTLY),
         )
         numberMinuteView.measure(
             MeasureSpec.makeMeasureSpec(numberWidth, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(measureHeight, MeasureSpec.EXACTLY),
-        )
-        dividerTextView.measure(
-            MeasureSpec.makeMeasureSpec(dividerWidth, MeasureSpec.EXACTLY),
-            MeasureSpec.makeMeasureSpec(measureHeight, MeasureSpec.EXACTLY),
+            MeasureSpec.makeMeasureSpec(numberWidth, MeasureSpec.EXACTLY),
         )
         setMeasuredDimension(measureWidth, measureHeight)
     }
@@ -59,7 +53,7 @@ class Clock @JvmOverloads constructor(
         } else {
             result = desiredSize
             if (specMode == MeasureSpec.AT_MOST) {
-                result = min(result, specSize)
+                result = max(result, specSize)
             }
         }
         if (result < desiredSize) {
@@ -70,22 +64,16 @@ class Clock @JvmOverloads constructor(
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         numberHourView.layout(
+            (r - l) / 2 - numberHourView.measuredWidth,
             0,
-            0,
-            numberHourView.measuredWidth,
-            b
-        )
-        dividerTextView.layout(
-            l + numberHourView.measuredWidth,
-            t,
-            r - numberMinuteView.measuredWidth,
-            b
+            (r - l) / 2,
+            b - t
         )
         numberMinuteView.layout(
-            r - l - numberHourView.measuredWidth - dividerTextView.measuredWidth,
+            (r - l) / 2,
             0,
-            r - l,
-            b
+            (r - l) / 2 + numberMinuteView.measuredWidth,
+            b - t
         )
     }
 }
