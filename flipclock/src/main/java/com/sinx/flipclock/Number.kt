@@ -19,6 +19,10 @@ internal class Number @JvmOverloads constructor(
     }
 
     var text = "88"
+        set(value) {
+            field = value
+            invalidate()
+        }
     private val bounds = Rect()
     private val dividerHeight = 5
 
@@ -56,6 +60,7 @@ internal class Number @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas?) {
         canvas?.let {
+            textPaint.color = Color.BLACK
             textPaint.getTextBounds(text, 0, text.length, bounds)
             val yPos = height.half + bounds.height().half
             it.save()
@@ -77,7 +82,4 @@ internal class Number @JvmOverloads constructor(
             it.drawText(text, 0f, yPos.toFloat(), textPaint)
         }
     }
-
-    private val Int.half
-        get() = this / 2
 }
