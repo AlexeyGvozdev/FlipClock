@@ -4,7 +4,6 @@ import android.content.Context
 import android.util.AttributeSet
 import android.util.Log
 import android.view.ViewGroup
-import java.util.Calendar
 import kotlin.math.max
 import kotlin.math.min
 
@@ -19,12 +18,8 @@ class Clock @JvmOverloads constructor(
         startNumber.text = start.coerce()
         endNumber.text = end.coerce()
     }
-    private val startValue = Calendar.getInstance().get(Calendar.MINUTE).toString()
-    private val endValue = Calendar.getInstance().get(Calendar.SECOND).toString()
 
     init {
-        startNumber.text = startValue
-        endNumber.text = endValue
         addView(startNumber)
         addView(endNumber)
     }
