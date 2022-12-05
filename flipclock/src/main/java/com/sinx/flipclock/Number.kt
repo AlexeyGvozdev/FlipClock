@@ -23,8 +23,9 @@ internal class Number @JvmOverloads constructor(
             field = value
             invalidate()
         }
-    private val bounds = Rect()
+    private var containerForNumber = Rect()
     private val dividerHeight = 5
+    private val rect = Rect()
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val desiredWidth = suggestedMinimumWidth + paddingLeft + paddingRight
@@ -34,6 +35,14 @@ internal class Number @JvmOverloads constructor(
         val measureHeight = measureDimension(desiredHeight, heightMeasureSpec)
         textPaint.textSize =
             minOf(measureHeight, measureWidth) / textPaint.measureText(text) * textPaint.textSize
+        if (containerForNumber.isEmpty) {
+            (0..9).forEach {
+                textPaint.getTextBounds("$it$it", 0, 2, rect)
+                if (rect.height() > containerForNumber.height()) {
+                    containerForNumber = rect
+                }
+            }
+        }
         setMeasuredDimension(
             measureWidth,
             measureHeight
@@ -61,8 +70,7 @@ internal class Number @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas?) {
         canvas?.let {
             textPaint.color = Color.BLACK
-            textPaint.getTextBounds(text, 0, text.length, bounds)
-            val yPos = height.half + bounds.height().half
+            val yPos = height.half + containerForNumber.height().half
             it.save()
             it.clipRect(
                 0,
