@@ -15,20 +15,24 @@ internal class Chronometer(
     private var isRunning = false
 
     fun start() {
-        if (!isRunning) {
-            isRunning = true
-            timer.scheduleAtFixedRate(TickTask {
-                calendar.time = Date()
-                val (start, end) = when (timePeriod) {
-                    TimePeriod.MINUTE -> calendar.get(Calendar.HOUR) to calendar.get(Calendar.MINUTE)
-                    TimePeriod.SECONDS -> calendar.get(Calendar.MINUTE) to calendar.get(Calendar.SECOND)
-                }
-                timeListener(start, end)
-            }, 0, timePeriod.period)
+        if (isRunning) {
+            return
         }
+        isRunning = true
+        timer.scheduleAtFixedRate(TickTask {
+            calendar.time = Date()
+            val (start, end) = when (timePeriod) {
+                TimePeriod.MINUTE -> calendar.get(Calendar.HOUR) to calendar.get(Calendar.MINUTE)
+                TimePeriod.SECONDS -> calendar.get(Calendar.MINUTE) to calendar.get(Calendar.SECOND)
+            }
+            timeListener(start, end)
+        }, 0, timePeriod.period)
     }
 
     fun cancel() {
+        if (!isRunning) {
+            return
+        }
         isRunning = false
         timer.cancel()
     }
