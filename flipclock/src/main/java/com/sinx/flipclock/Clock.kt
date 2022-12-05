@@ -11,19 +11,28 @@ class Clock @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : ViewGroup(context, attrs, defStyleAttr) {
 
-    private val numberHourView = Number(context, attrs, defStyleAttr)
-    private val numberMinuteView = Number(context, attrs, defStyleAttr)
+    private val startNumber = Number(context, attrs, defStyleAttr)
+    private val endNumber = Number(context, attrs, defStyleAttr)
 
-    private val hour = "10"
-    private val min = "45"
-
-    init {
-        numberHourView.text = hour
-        numberMinuteView.text = min
-        addView(numberHourView)
-        addView(numberMinuteView)
+    private val chronometer = Chronometer(TimePeriod.SECONDS) { start, end ->
+        startNumber.text = start.coerce()
+        endNumber.text = end.coerce()
     }
 
+    init {
+        addView(startNumber)
+        addView(endNumber)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+        chronometer.cancel()
+    }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        chronometer.start()
+    }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val desiredWidth = suggestedMinimumWidth + paddingLeft + paddingRight
@@ -32,11 +41,11 @@ class Clock @JvmOverloads constructor(
         val measureWidth = measureDimension(desiredWidth, widthMeasureSpec)
         val measureHeight = measureDimension(desiredHeight, heightMeasureSpec)
         val numberWidth = min(measureWidth / 2, measureHeight)
-        numberHourView.measure(
+        startNumber.measure(
             MeasureSpec.makeMeasureSpec(numberWidth, MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(numberWidth, MeasureSpec.EXACTLY),
         )
-        numberMinuteView.measure(
+        endNumber.measure(
             MeasureSpec.makeMeasureSpec(numberWidth, MeasureSpec.EXACTLY),
             MeasureSpec.makeMeasureSpec(numberWidth, MeasureSpec.EXACTLY),
         )
@@ -63,16 +72,16 @@ class Clock @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        numberHourView.layout(
-            (r - l) / 2 - numberHourView.measuredWidth,
+        startNumber.layout(
+            (r - l) / 2 - startNumber.measuredWidth,
             0,
             (r - l) / 2,
             b - t
         )
-        numberMinuteView.layout(
+        endNumber.layout(
             (r - l) / 2,
             0,
-            (r - l) / 2 + numberMinuteView.measuredWidth,
+            (r - l) / 2 + endNumber.measuredWidth,
             b - t
         )
     }
